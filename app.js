@@ -41,6 +41,12 @@ app.use(session(sessionParms));
 // flash messages (depends on session being set up)
 app.use(require("connect-flash")());
 
+app.use(require("./middleware/storeLocals"));
+app.get("/", (req, res) => {
+  res.render("index");
+});
+app.use("/sessions", require("./routes/sessionRoutes"));
+
 app.get("/secretWord", (req, res) => {
     if (!req.session.secretWord) {
       req.session.secretWord = "syzygy";
@@ -73,6 +79,7 @@ const port = process.env.PORT || 3000;
 
 const start = async () => {
   try {
+    await require("./db/connect")(process.env.MONGO_URI);
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`)
     );
